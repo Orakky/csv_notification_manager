@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Data Architect - Precision Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#d5e3fc",
+              "surface-bright": "#faf8ff",
+              "on-tertiary-fixed": "#001e2f",
+              "tertiary-fixed": "#c9e6ff",
+              "surface": "#faf8ff",
+              "secondary-fixed-dim": "#b9c7df",
+              "on-surface-variant": "#424752",
+              "primary": "#00488d",
+              "tertiary": "#004d70",
+              "surface-tint": "#005db5",
+              "outline": "#727783",
+              "outline-variant": "#c2c6d4",
+              "on-error-container": "#93000a",
+              "on-background": "#131b2e",
+              "primary-fixed": "#d6e3ff",
+              "on-primary": "#ffffff",
+              "on-secondary": "#ffffff",
+              "on-tertiary-fixed-variant": "#004c6e",
+              "on-primary-fixed-variant": "#00468b",
+              "primary-fixed-dim": "#a8c8ff",
+              "on-error": "#ffffff",
+              "surface-container-low": "#f2f3ff",
+              "error": "#ba1a1a",
+              "surface-variant": "#dae2fd",
+              "secondary": "#515f74",
+              "surface-container": "#eaedff",
+              "primary-container": "#005fb8",
+              "on-tertiary": "#ffffff",
+              "inverse-primary": "#a8c8ff",
+              "on-primary-container": "#cadcff",
+              "tertiary-container": "#006693",
+              "on-surface": "#131b2e",
+              "background": "#faf8ff",
+              "on-primary-fixed": "#001b3d",
+              "surface-dim": "#d2d9f4",
+              "inverse-surface": "#283044",
+              "error-container": "#ffdad6",
+              "inverse-on-surface": "#eef0ff",
+              "on-tertiary-container": "#b8e0ff",
+              "on-secondary-fixed": "#0d1c2e",
+              "on-secondary-fixed-variant": "#3a485b",
+              "secondary-container": "#d5e3fc",
+              "surface-container-highest": "#dae2fd",
+              "on-secondary-container": "#57657a",
+              "surface-container-high": "#e2e7ff",
+              "tertiary-fixed-dim": "#89ceff",
+              "surface-container-lowest": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #faf8ff;
+      }
+      h1, h2, h3 {
+        font-family: 'Manrope', sans-serif;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f2f3ff;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #c2c6d4;
+        border-radius: 10px;
+      }
+    </style>
+</head>
+<body class="text-on-background antialiased overflow-hidden">
+<!-- SideNavBar Shell -->
+<aside class="flex flex-col h-full fixed left-0 top-0 z-40 bg-slate-100 dark:bg-slate-900 h-screen w-64 border-r-0 font-manrope text-sm font-medium">
+<div class="p-6">
+<h1 class="text-xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">Precision Engine</h1>
+<p class="text-xs text-secondary mt-1">Data Architect</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-colors duration-200 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-colors duration-200 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-r-4 border-blue-700" href="#">
+<span class="material-symbols-outlined text-[20px]">upload_file</span>
+<span>Data Import</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-colors duration-200 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span>History</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded transition-colors duration-200 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<span>Message Templates</span>
+</a>
+</nav>
+<div class="px-4 py-6 border-t border-slate-200 dark:border-slate-800 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span>Help</span>
+</a>
+<div class="flex items-center gap-3 mt-6 p-3 bg-white dark:bg-slate-800 rounded-xl shadow-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">
+                    JD
+                </div>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">John Doe</p>
+<p class="text-[10px] text-secondary truncate">Lead Architect</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="flex justify-between items-center pl-72 pr-8 w-full sticky top-0 z-30 bg-white dark:bg-slate-950 w-full h-16 border-b-0 shadow-sm dark:shadow-none font-inter text-sm">
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">search</span>
+<input class="bg-surface-container-low border-none rounded-full py-1.5 pl-10 pr-4 w-64 focus:ring-2 focus:ring-blue-500/20 text-sm transition-all outline-none" placeholder="Search projects..." type="text"/>
+</div>
+<nav class="flex items-center gap-6">
+<a class="text-slate-500 hover:text-blue-600 transition-colors" href="#">Projects</a>
+<a class="text-slate-500 hover:text-blue-600 transition-colors" href="#">Templates</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant/30 mx-2"></div>
+<img alt="User profile" class="w-8 h-8 rounded-full object-cover" data-alt="close-up portrait of a professional male architect in a bright modern office with warm natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-9Wthsr3ZLxM4M-J3otg5Rz8zb92sACMY_QyLE8VRDBe8aNyYm92owWN3zrPGJ3TVWImO8m1d-rGOg7iFp6dJNI4nm5wi7AeGA2dd2H8O1YIFsXodqTrO1gOPUPaOZ9ztcW1RJW-B0Y8wzISa61pAyB1jFzeoy2HL9zmy6OGdoloAK67P-bM-g2mFo6RtHmHUYX29TYzBvMDyd8eyHZOyUQXl_feGz1X8JVtMsczC8raIwFtjoWFl9Xznyz0HDKWFXRFQji4rVLDY"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pl-64 pt-0 min-h-screen bg-surface">
+<div class="max-w-[1600px] mx-auto p-8 space-y-8">
+<!-- Page Header -->
+<div class="flex justify-between items-end">
+<div>
+<h2 class="text-3xl font-extrabold tracking-tight text-on-surface font-headline">Data Import &amp; Parsing</h2>
+<p class="text-secondary mt-1">Ingest, validate, and extract identifiers from architectural datasets.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-surface-container-lowest border border-outline-variant/30 text-secondary font-medium rounded-lg hover:bg-surface-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">download</span>
+                        Export Logs
+                    </button>
+<button class="px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-white font-semibold rounded-lg shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">auto_awesome</span>
+                        Map Columns
+                    </button>
+</div>
+</div>
+<!-- Upper Section: Bento Drop Zone -->
+<div class="grid grid-cols-12 gap-6">
+<div class="col-span-12 lg:col-span-8">
+<div class="relative group h-64 bg-surface-container-low rounded-xl border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center transition-all hover:bg-surface-container-high hover:border-primary/40">
+<div class="w-16 h-16 bg-white shadow-xl shadow-primary/5 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-3xl">cloud_upload</span>
+</div>
+<h3 class="text-lg font-bold font-headline">Drop your data files here</h3>
+<p class="text-sm text-secondary mt-1">Supports Excel (.xlsx) and CSV datasets up to 50MB</p>
+<div class="mt-6 flex gap-4 text-xs font-bold text-outline uppercase tracking-widest">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">check_circle</span> Auto-detect</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">check_circle</span> Regex Validation</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">check_circle</span> De-duplication</span>
+</div>
+<input class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4">
+<div class="h-64 bg-surface-container-highest/50 backdrop-blur-xl rounded-xl p-6 flex flex-col justify-between overflow-hidden relative">
+<div>
+<span class="text-[0.6875rem] font-bold text-primary uppercase tracking-widest mb-2 block">Quick Stats</span>
+<h4 class="text-xl font-bold font-headline mb-4">Last Import Summary</h4>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm text-secondary">Total Records</span>
+<span class="font-mono font-bold text-on-surface">12,482</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-secondary">Parsing Success</span>
+<span class="font-mono font-bold text-primary">99.4%</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-secondary">Extraction Depth</span>
+<span class="font-mono font-bold text-tertiary">High</span>
+</div>
+</div>
+</div>
+<!-- Decorative element -->
+<div class="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+</div>
+</div>
+</div>
+<!-- Lower Section: Data Table & Extraction Sidebar -->
+<div class="grid grid-cols-12 gap-6 items-start pb-24">
+<!-- Data Table Canvas -->
+<div class="col-span-12 xl:col-span-9 bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden min-h-[500px]">
+<div class="px-6 py-4 bg-surface-container-low flex justify-between items-center">
+<div class="flex items-center gap-4">
+<span class="text-sm font-bold font-headline">Imported Rows: client_leads_q3.csv</span>
+<span class="px-2 py-0.5 bg-tertiary-container text-on-tertiary-container text-[10px] font-bold rounded uppercase">Draft State</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-1.5 hover:bg-surface-container rounded transition-colors"><span class="material-symbols-outlined text-lg">filter_list</span></button>
+<button class="p-1.5 hover:bg-surface-container rounded transition-colors"><span class="material-symbols-outlined text-lg">settings_ethernet</span></button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant/10">
+<th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">Source Index</th>
+<th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">Lead Name</th>
+<th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">Extracted Email</th>
+<th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">Phone Identifier</th>
+<th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">QQ/Social ID</th>
+<th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-high transition-colors group">
+<td class="px-6 py-4 text-xs font-mono text-outline">#001024</td>
+<td class="px-6 py-4 text-sm font-medium">Alexandru Chen</td>
+<td class="px-6 py-4 text-sm text-primary font-medium bg-primary/5">a.chen@vector.io</td>
+<td class="px-6 py-4 text-sm text-primary font-medium bg-primary/5">+86 138-xxxx-9201</td>
+<td class="px-6 py-4 text-sm text-tertiary font-mono">QQ: 82910443</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700">VALIDATED</span>
+</td>
+</tr>
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-high transition-colors group">
+<td class="px-6 py-4 text-xs font-mono text-outline">#001025</td>
+<td class="px-6 py-4 text-sm font-medium">Sarah Jenkins</td>
+<td class="px-6 py-4 text-sm text-primary font-medium bg-primary/5">s.jenkins@arch.net</td>
+<td class="px-6 py-4 text-sm text-outline italic">Not found</td>
+<td class="px-6 py-4 text-sm text-tertiary font-mono">skype: s_jenk_99</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">INCOMPLETE</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors group">
+<td class="px-6 py-4 text-xs font-mono text-outline">#001026</td>
+<td class="px-6 py-4 text-sm font-medium">Hiroshi Tanaka</td>
+<td class="px-6 py-4 text-sm text-primary font-medium bg-primary/5">h.tanaka@tokyo.jp</td>
+<td class="px-6 py-4 text-sm text-primary font-medium bg-primary/5">+81 90-xxxx-1123</td>
+<td class="px-6 py-4 text-sm text-tertiary font-mono">QQ: 90021345</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700">VALIDATED</span>
+</td>
+</tr>
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-high transition-colors group">
+<td class="px-6 py-4 text-xs font-mono text-outline">#001027</td>
+<td class="px-6 py-4 text-sm font-medium">Elena Rodriguez</td>
+<td class="px-6 py-4 text-sm text-error font-medium bg-error-container/20">e.rodriguez@invalid</td>
+<td class="px-6 py-4 text-sm text-primary font-medium bg-primary/5">+34 600-xxxx-445</td>
+<td class="px-6 py-4 text-sm text-tertiary font-mono">QQ: 11200344</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-700">ERROR</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors group">
+<td class="px-6 py-4 text-xs font-mono text-outline">#001028</td>
+<td class="px-6 py-4 text-sm font-medium">Marcus Aurelius</td>
+<td class="px-6 py-4 text-sm text-primary font-medium bg-primary/5">m.aurelius@stoic.it</td>
+<td class="px-6 py-4 text-sm text-primary font-medium bg-primary/5">+39 333-xxxx-001</td>
+<td class="px-6 py-4 text-sm text-tertiary font-mono">QQ: 55443322</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700">VALIDATED</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Extraction Highlight Sidebar -->
+<div class="col-span-12 xl:col-span-3 space-y-6">
+<div class="bg-white rounded-xl shadow-lg shadow-on-surface/5 p-6 border border-outline-variant/10">
+<div class="flex items-center justify-between mb-6">
+<h5 class="text-sm font-bold font-headline">Extracted Contacts</h5>
+<span class="material-symbols-outlined text-primary">analytics</span>
+</div>
+<div class="space-y-6">
+<div class="group cursor-pointer">
+<div class="flex justify-between items-center mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-primary">mail</span>
+<span class="text-xs font-bold text-secondary uppercase">Emails</span>
+</div>
+<span class="text-xs font-mono font-bold">1,204</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="flex justify-between items-center mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-primary">phone_iphone</span>
+<span class="text-xs font-bold text-secondary uppercase">Phone Numbers</span>
+</div>
+<span class="text-xs font-mono font-bold">942</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[60%]"></div>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="flex justify-between items-center mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-tertiary">chat_bubble</span>
+<span class="text-xs font-bold text-secondary uppercase">QQ IDs</span>
+</div>
+<span class="text-xs font-mono font-bold">418</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full w-[35%]"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/10">
+<h6 class="text-xs font-bold text-on-surface mb-3">Correction Queue</h6>
+<div class="space-y-3 max-h-[200px] overflow-y-auto custom-scrollbar pr-2">
+<div class="p-3 bg-error-container/10 border-l-2 border-error rounded-r flex flex-col gap-1">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold text-error">INVALID FORMAT</span>
+<button class="material-symbols-outlined text-xs hover:text-error">edit</button>
+</div>
+<span class="text-xs font-mono text-on-error-container truncate">e.rodriguez@invalid</span>
+</div>
+<div class="p-3 bg-surface-container rounded flex flex-col gap-1 opacity-70">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-bold text-secondary">AMBIGUOUS ID</span>
+<button class="material-symbols-outlined text-xs hover:text-primary">edit</button>
+</div>
+<span class="text-xs font-mono text-secondary truncate">QQ: ?unknown?</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Card -->
+<div class="bg-gradient-to-br from-inverse-surface to-slate-900 rounded-xl p-6 text-white overflow-hidden relative">
+<h5 class="text-sm font-bold mb-2">Workflow Progress</h5>
+<p class="text-xs text-slate-400 mb-6">You have 4,203 valid contacts ready for messaging.</p>
+<div class="flex -space-x-2 mb-6">
+<img class="w-8 h-8 rounded-full border-2 border-inverse-surface object-cover" data-alt="portrait of a young asian woman in creative workspace" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkCeyI7aeOMrjSRhjN4UzQ_t7mmfuXs0-ahjkCAnN-T75rV1Izo_E41T5O-WJyEseJp50FWFsFdn2YZLiD1vDpsmC8BLyEGUk6BdC3gmSdxIQHOBFCOliGE_38QWkQQ11TQ6gcKS60GcTFa5bup7pJA1B3ElDFUvFzmf1HqIwXGf9_u5BQ8L83GY9KDVNl_B0jXPbA-jSXU8tOCtFWDTFEbqcJTXetNdzH8gBsIeWTCUpQOoazvZGKKR1Bfw3Xcpo8WnBY1pf4lCM0"/>
+<img class="w-8 h-8 rounded-full border-2 border-inverse-surface object-cover" data-alt="professional headshot of a smiling middle aged man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvbORGDKH3hPzJHLO8ule7wtu2Z1F7vFBIBlGx_jKuYlw7yHI5TQAVMfnBteqJmX1TVEvLcihafVyjdVnhGWBP6DNDTUwb7gU6HL6PuISFHTftI0UpLk86zbeMwsEE0DRZzFBsdX46ZcGukfY7tvGcAeRA5Bzs0zpeWuJ02tnPBddPU-UZb5ruLp9Bon-W9p6dShlz5LbaraOhe5AJsufFDeVbfFUPSYAeIMYX9xPdBMNUCxwRRM-2X5Cs4xOU7SGfIHHybT9Uu3ws"/>
+<div class="w-8 h-8 rounded-full border-2 border-inverse-surface bg-slate-700 flex items-center justify-center text-[10px] font-bold">+12</div>
+</div>
+<div class="absolute -top-10 -right-10 opacity-20 transform rotate-12">
+<span class="material-symbols-outlined text-9xl">rocket_launch</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Primary Action -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="group flex items-center gap-3 bg-gradient-to-r from-primary to-primary-container text-white pl-6 pr-2 py-2 rounded-full shadow-2xl shadow-primary/40 hover:scale-105 transition-all">
+<span class="font-bold tracking-tight">Generate Message</span>
+<div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</button>
+</div>
+</main>
+</body></html>

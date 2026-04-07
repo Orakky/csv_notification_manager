@@ -8,10 +8,12 @@ import HistoryView from './components/HistoryView.vue';
 import TemplatesView from './components/TemplatesView.vue';
 import SettingsView from './components/SettingsView.vue';
 import SendProgressModal from './components/SendProgressModal.vue';
+import SendHistoryView from './components/SendHistoryView.vue';
 import { useFileHistory } from './composables/useFileHistory';
 import { useFileParser } from './composables/useFileParser';
 import { useMessageGenerator } from './composables/useMessageGenerator';
 import { useMessageSender } from './composables/useMessageSender';
+import { useAddressHistory } from './composables/useAddressHistory';
 import { ViewTypes } from './types';
 
 // 使用 composables
@@ -45,16 +47,22 @@ const {
   sendProgress, 
   sendResults, 
   sendError, 
+  sendHistory,
   sendMessages, 
   clearSendState,
   getSendStats,
+  loadSendHistory,
   addToSendHistory,
-  retryFailedMessages
+  retryFailedMessages,
+  resendFromHistory
 } = useMessageSender();
+
+const { addToAddressHistory } = useAddressHistory();
 
 // 初始化
 onMounted(() => {
   loadHistory();
+  loadSendHistory();
 });
 
 // 处理视图切换
@@ -162,6 +170,11 @@ async function handleSendMessages() {
     const stats = getSendStats();
     addToSendHistory(generatedMessages.value, sendResults.value, stats);
     console.log('[App] 发送记录已保存到历史');
+    
+    // 保存地址到历史记录
+    const addresses = generatedMessages.value.map(msg => msg.contact);
+    addToAddressHistory(addresses);
+    console.log('[App] 地址已保存到历史记录');
   }
 }
 
@@ -169,6 +182,34 @@ async function handleSendMessages() {
 function handleRetryFailed(historyItem) {
   console.log('[App] 重发失败消息:', historyItem);
   retryFailedMessages(historyItem);
+}
+
+// 处理从历史记录重新发送
+async function handleResendFromHistory(historyItem) {
+  console.log('[App] 从历史记录重新发送:', historyItem);
+  
+  const confirmed = confirm(`确定要重新发送 ${historyItem.messageCount} 条消息吗？`);
+  console.log('[App] 用户确认重新发送:', confirmed);
+  if (!confirmed) return;
+  
+  // 显示发送弹窗
+  showSendModal.value = true;
+  
+  console.log('[App] 开始调用重新发送函数');
+  const success = await resendFromHistory(historyItem);
+  console.log('[App] 重新发送结果:', success);
+  
+  // 发送完成后自动保存历史
+  if (sendResults.value.length > 0) {
+    const stats = getSendStats();
+    addToSendHistory(historyItem.messages, sendResults.value, stats);
+    console.log('[App] 重新发送记录已保存到历史');
+    
+    // 保存地址到历史记录
+    const addresses = historyItem.messages.map(msg => msg.contact);
+    addToAddressHistory(addresses);
+    console.log('[App] 地址已保存到历史记录');
+  }
 }
 
 // 关闭发送弹窗
@@ -199,6 +240,22 @@ function handleEditTemplate(template) {
 
 function handleDeleteTemplate(id) {
   console.log('Delete template:', id);
+}
+
+// 处理发送历史相关事件
+function handleDeleteSendHistory(id) {
+  const index = sendHistory.value.findIndex(item => item.id === id);
+  if (index !== -1) {
+    sendHistory.value.splice(index, 1);
+    localStorage.setItem('sendHistory', JSON.stringify(sendHistory.value));
+    console.log('[App] 删除发送历史记录:', id);
+  }
+}
+
+function handleClearSendHistory() {
+  sendHistory.value = [];
+  localStorage.setItem('sendHistory', JSON.stringify(sendHistory.value));
+  console.log('[App] 清空所有发送历史');
 }
 </script>
 
@@ -259,6 +316,15 @@ function handleDeleteTemplate(id) {
       
       <SettingsView 
         v-else-if="currentView === ViewTypes.SETTINGS"
+      />
+      
+      <SendHistoryView 
+        v-else-if="currentView === 'send-history'"
+        :sendHistory="sendHistory"
+        @retry-failed="handleRetryFailed"
+        @delete-history="handleDeleteSendHistory"
+        @clear-history="handleClearSendHistory"
+        @resend-history="handleResendFromHistory"
       />
     </main>
     

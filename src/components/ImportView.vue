@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import { formatNumber } from '../utils/formatters';
 import { getCellImage } from '../utils';
 import { useMessageTemplates } from '../composables/useMessageTemplates';
+import { useAddressHistory } from '../composables/useAddressHistory';
 
 const props = defineProps({
   fileData: {
@@ -40,6 +41,13 @@ const props = defineProps({
 });
 
 const { activeTemplates, loadTemplates } = useMessageTemplates();
+const { 
+  addressHistory, 
+  loadAddressHistory, 
+  addToAddressHistory, 
+  getRecentAddresses,
+  getFrequentAddresses
+} = useAddressHistory();
 
 const emit = defineEmits([
   'select-file',
@@ -53,9 +61,20 @@ const emit = defineEmits([
   'update-custom-addresses'
 ]);
 
+const recentAddresses = ref([]);
+const frequentAddresses = ref([]);
+const showAddressHistory = ref(true);
+
 onMounted(() => {
   loadTemplates();
+  loadAddressHistory();
+  updateAddressLists();
 });
+
+function updateAddressLists() {
+  recentAddresses.value = getRecentAddresses(8);
+  frequentAddresses.value = getFrequentAddresses(8);
+}
 
 function handleSelectFile() {
   emit('select-file');
@@ -101,6 +120,22 @@ function handleCustomAddressesChange(event) {
     .filter(line => line.length > 0);
   emit('update-custom-addresses', addresses);
 }
+
+// 添加单个地址到输入框
+function addSingleAddress(address) {
+  if (!props.customAddresses.includes(address)) {
+    const newAddresses = [...props.customAddresses, address];
+    emit('update-custom-addresses', newAddresses);
+  }
+}
+
+// 一键导入全部历史地址
+function importAllAddresses() {
+  const allAddresses = addressHistory.value.map(item => item.address);
+  const mergedAddresses = [...new Set([...props.customAddresses, ...allAddresses])];
+  emit('update-custom-addresses', mergedAddresses);
+}
+
 
 const canGenerate = computed(() => {
   if (!props.fileData || !props.messageTemplate) {
@@ -300,8 +335,60 @@ const canGenerate = computed(() => {
         </div>
 
         <!-- Custom Address Input (for custom source) -->
-        <div v-if="addressSourceType === 'custom'" class="config-card">
+        <div v-if="addressSourceType === 'custom'" class="config-card custom-address-card">
           <h4 class="config-title">自定义地址列表</h4>
+          
+          <!-- Address History Section -->
+          <div v-if="addressHistory.length > 0" class="address-history-section">
+            <div class="history-header" @click="showAddressHistory = !showAddressHistory">
+              <span class="history-title">📋 历史地址</span>
+              <svg class="history-toggle-icon" 
+                   :class="{ 'rotated': showAddressHistory }"
+                   width="16" height="16" viewBox="0 0 24 24" 
+                   fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            
+            <div v-show="showAddressHistory" class="history-content">
+              <div v-if="frequentAddresses.length > 0" class="history-group">
+                <span class="history-group-title">常用地址</span>
+                <div class="history-tags">
+                  <button 
+                    v-for="item in frequentAddresses" 
+                    :key="item.id"
+                    @click="addSingleAddress(item.address)"
+                    class="history-tag"
+                    :title="`使用次数: ${item.usedCount}`"
+                  >
+                    {{ item.address }}
+                    <span class="count-badge">{{ item.usedCount }}</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div v-if="recentAddresses.length > 0" class="history-group">
+                <span class="history-group-title">最近使用</span>
+                <div class="history-tags">
+                  <button 
+                    v-for="item in recentAddresses" 
+                    :key="item.id"
+                    @click="addSingleAddress(item.address)"
+                    class="history-tag"
+                  >
+                    {{ item.address }}
+                  </button>
+                </div>
+              </div>
+              
+              <div class="history-actions">
+                <button class="import-all-button" @click="importAllAddresses">
+                  📥 一键导入全部历史地址
+                </button>
+              </div>
+            </div>
+          </div>
+          
           <textarea 
             :value="customAddresses.join('\n')"
             @input="handleCustomAddressesChange"
@@ -1055,6 +1142,126 @@ const canGenerate = computed(() => {
 
 .custom-address-textarea {
   min-height: 150px;
+}
+
+/* Address History Styles */
+.address-history-section {
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--surface-container-low);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.history-header:hover {
+  background: var(--surface-container);
+}
+
+.history-title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.history-toggle-icon {
+  transition: transform 0.2s ease;
+}
+
+.history-toggle-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.history-content {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--outline-variant);
+}
+
+.history-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.history-group:last-child {
+  margin-bottom: 0;
+}
+
+.history-group-title {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.history-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.history-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  color: var(--on-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.history-tag:hover {
+  background: var(--primary-container);
+  border-color: var(--primary);
+  color: var(--on-primary-container);
+}
+
+.count-badge {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  background: rgba(0, 72, 141, 0.1);
+  color: var(--primary);
+  padding: 1px 4px;
+  border-radius: var(--radius-sm);
+}
+
+.history-actions {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--outline-variant);
+}
+
+.import-all-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+  color: var(--on-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.import-all-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 /* Responsive for address source selector */

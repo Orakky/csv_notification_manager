@@ -34,6 +34,7 @@ function addToSendHistory(messages, results, stats) {
     id: Date.now(),
     timestamp: new Date().toISOString(),
     messageCount: messages.length,
+    messages: messages, // 保存完整消息内容
     results: results,
     stats: stats
   };
@@ -177,15 +178,32 @@ async function retryFailedMessages(historyItem) {
     return false;
   }
   
+  // 从历史记录中获取原始消息内容
+  const originalMessages = historyItem.messages || [];
+  
   // 构造重发消息数组
-  const messagesToRetry = failedMessages.map(failed => ({
-    index: failed.index,
-    contact: failed.contact,
-    contactType: failed.contactType,
-    message: '重发消息' // 这里应该从原始消息中获取，简化处理
-  }));
+  const messagesToRetry = failedMessages.map(failed => {
+    const originalMessage = originalMessages.find(msg => msg.contact === failed.contact);
+    return {
+      index: failed.index,
+      contact: failed.contact,
+      contactType: failed.contactType,
+      message: originalMessage ? originalMessage.message : '重发消息'
+    };
+  });
   
   return await sendMessages(messagesToRetry);
+}
+
+// 从历史记录重新发送所有消息
+async function resendFromHistory(historyItem) {
+  if (!historyItem.messages || historyItem.messages.length === 0) {
+    sendError.value = '历史记录中没有消息内容';
+    return false;
+  }
+  
+  console.log('[MessageSender] 从历史记录重新发送，消息数量:', historyItem.messages.length);
+  return await sendMessages(historyItem.messages);
 }
 
 export function useMessageSender() {
@@ -200,6 +218,7 @@ export function useMessageSender() {
     getSendStats,
     loadSendHistory,
     addToSendHistory,
-    retryFailedMessages
+    retryFailedMessages,
+    resendFromHistory
   };
 }

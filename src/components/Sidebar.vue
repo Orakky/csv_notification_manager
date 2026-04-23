@@ -102,6 +102,17 @@ function navigateTo(view) {
         </svg>
         <span>Send History</span>
       </button>
+      
+      <button 
+        @click="navigateTo('query-manager')" 
+        :class="['nav-item', { active: currentView === 'query-manager' || currentView === 'query-config' || currentView === 'query' || currentView === 'query-result' }]"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <span>Query</span>
+      </button>
     </nav>
   </aside>
 </template>

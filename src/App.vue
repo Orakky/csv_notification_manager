@@ -9,11 +9,17 @@ import TemplatesView from './components/TemplatesView.vue';
 import SettingsView from './components/SettingsView.vue';
 import SendProgressModal from './components/SendProgressModal.vue';
 import SendHistoryView from './components/SendHistoryView.vue';
+import QueryManagerView from './components/QueryManagerView.vue';
+import QueryConfigView from './components/QueryConfigView.vue';
+import QueryView from './components/QueryView.vue';
+import QueryResultView from './components/QueryResultView.vue';
+import QueryFileSelectView from './components/QueryFileSelectView.vue';
 import { useFileHistory } from './composables/useFileHistory';
 import { useFileParser } from './composables/useFileParser';
 import { useMessageGenerator } from './composables/useMessageGenerator';
 import { useMessageSender } from './composables/useMessageSender';
 import { useAddressHistory } from './composables/useAddressHistory';
+import { useQueryEngine } from './composables/useQueryEngine';
 import { ViewTypes } from './types';
 
 // 使用 composables
@@ -59,10 +65,43 @@ const {
 
 const { addToAddressHistory } = useAddressHistory();
 
+// 使用查询引擎
+const {
+  queryConfigs,
+  currentSession,
+  queryResults,
+  querying,
+  queryError,
+  loadQueryConfigs,
+  createQueryConfig,
+  updateQueryConfig,
+  deleteQueryConfig,
+  executeQuery,
+  clearQueryState,
+  getQueryStats,
+  generateQueryLink,
+  parseQueryFromUrl
+} = useQueryEngine();
+
+// 查询相关状态
+const currentQueryConfig = ref(null);
+const queryFileData = ref(null);
+const queryFileInfo = ref(null);
+
 // 初始化
 onMounted(() => {
   loadHistory();
   loadSendHistory();
+  loadQueryConfigs();
+  
+  // 检查 URL 中是否有查询配置 ID
+  const queryConfigId = parseQueryFromUrl();
+  if (queryConfigId) {
+    const config = queryConfigs.value.find(c => c.id === parseInt(queryConfigId));
+    if (config) {
+      handleExecuteQuery(config);
+    }
+  }
 });
 
 // 处理视图切换
@@ -257,6 +296,137 @@ function handleClearSendHistory() {
   localStorage.setItem('sendHistory', JSON.stringify(sendHistory.value));
   console.log('[App] 清空所有发送历史');
 }
+
+// 查询相关处理函数
+function handleSelectQueryFile() {
+  console.log('[App] 选择查询文件');
+  currentView.value = 'query-select-file';
+}
+
+function handleCreateQueryConfig() {
+  console.log('[App] 创建查询配置');
+  if (!fileData.value) {
+    alert('请先选择一个文件');
+    return;
+  }
+  queryFileData.value = fileData.value;
+  currentQueryConfig.value = null;
+  currentView.value = 'query-config';
+}
+
+function handleEditQueryConfig(config) {
+  console.log('[App] 编辑查询配置:', config);
+  // 从历史记录中找到对应的文件数据
+  const historyItem = fileHistory.value.find(h => h.id === config.fileId);
+  if (historyItem) {
+    queryFileData.value = historyItem.data;
+    currentQueryConfig.value = config;
+    currentView.value = 'query-config';
+  } else {
+    alert('找不到对应的文件数据');
+  }
+}
+
+function handleDeleteQueryConfig(id) {
+  console.log('[App] 删除查询配置:', id);
+  deleteQueryConfig(id);
+}
+
+function handleExecuteQuery(config) {
+  console.log('[App] 执行查询:', config);
+  // 从历史记录中找到对应的文件数据
+  const historyItem = fileHistory.value.find(h => h.id === config.fileId);
+  if (historyItem) {
+    queryFileData.value = historyItem.data;
+    currentQueryConfig.value = config;
+    currentView.value = 'query';
+  } else {
+    alert('找不到对应的文件数据');
+  }
+}
+
+function handleSaveQueryConfig(data) {
+  console.log('[App] 保存查询配置:', data);
+  
+  if (currentQueryConfig.value) {
+    // 更新现有配置
+    updateQueryConfig(currentQueryConfig.value.id, {
+      name: data.name,
+      conditions: data.conditions
+    });
+  } else {
+    // 使用保存的文件信息
+    const fileId = queryFileInfo.value ? queryFileInfo.value.id : Date.now();
+    const fileName = queryFileInfo.value ? queryFileInfo.value.fileName : '未命名文件';
+    
+    // 创建新配置
+    createQueryConfig(
+      data.name,
+      fileId,
+      fileName,
+      data.conditions
+    );
+  }
+  
+  currentView.value = 'query-manager';
+}
+
+function handleCancelQueryConfig() {
+  console.log('[App] 取消查询配置');
+  currentView.value = 'query-manager';
+}
+
+function handleExecuteQueryWithParams(data) {
+  console.log('[App] 执行查询，参数:', data);
+  
+  const session = executeQuery(queryFileData.value, data.config, data.parameters);
+  if (session) {
+    currentView.value = 'query-result';
+  }
+}
+
+function handleBackToQuery() {
+  console.log('[App] 返回查询管理界面');
+  currentView.value = 'query-manager';
+}
+
+function handleExportQueryResults(session) {
+  console.log('[App] 导出查询结果:', session);
+  
+  // 构建 CSV 内容
+  const headers = Object.keys(session.results[0].data);
+  const csvContent = [
+    headers.join(','),
+    ...session.results.map(row => 
+      headers.map(h => `"${row.data[h] || ''}"`).join(',')
+    )
+  ].join('\n');
+  
+  // 下载文件
+  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `查询结果_${session.config.name}_${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+}
+
+// 处理查询文件选择
+function handleQueryFileSelect(item) {
+  console.log('[App] 选择查询文件:', item);
+  queryFileData.value = item.data;
+  queryFileInfo.value = {
+    id: item.id,
+    fileName: item.fileName
+  };
+  currentQueryConfig.value = null;
+  currentView.value = 'query-config';
+}
+
+// 取消查询文件选择
+function handleCancelQueryFileSelect() {
+  console.log('[App] 取消查询文件选择');
+  currentView.value = 'query-manager';
+}
 </script>
 
 <template>
@@ -325,6 +495,46 @@ function handleClearSendHistory() {
         @delete-history="handleDeleteSendHistory"
         @clear-history="handleClearSendHistory"
         @resend-history="handleResendFromHistory"
+      />
+      
+      <QueryManagerView 
+        v-else-if="currentView === 'query-manager'"
+        :queryConfigs="queryConfigs"
+        :fileHistory="fileHistory"
+        @select-file="handleSelectQueryFile"
+        @edit="handleEditQueryConfig"
+        @delete="handleDeleteQueryConfig"
+        @execute="handleExecuteQuery"
+      />
+      
+      <QueryConfigView 
+        v-else-if="currentView === 'query-config'"
+        :fileData="queryFileData"
+        :existingConfig="currentQueryConfig"
+        @save="handleSaveQueryConfig"
+        @cancel="handleCancelQueryConfig"
+      />
+      
+      <QueryView 
+        v-else-if="currentView === 'query'"
+        :queryConfig="currentQueryConfig"
+        :fileData="queryFileData"
+        @execute="handleExecuteQueryWithParams"
+        @back="handleBackToQuery"
+      />
+      
+      <QueryResultView 
+        v-else-if="currentView === 'query-result' && currentSession"
+        :querySession="currentSession"
+        @back="handleBackToQuery"
+        @export="handleExportQueryResults"
+      />
+      
+      <QueryFileSelectView 
+        v-else-if="currentView === 'query-select-file'"
+        :fileHistory="fileHistory"
+        @select="handleQueryFileSelect"
+        @cancel="handleCancelQueryFileSelect"
       />
     </main>
     

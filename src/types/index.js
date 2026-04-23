@@ -65,3 +65,21 @@ export const StatusBadgeTypes = {
   WARNING: 'warning',
   ERROR: 'error'
 }
+
+// 查询操作符
+export const QueryOperators = {
+  EQUALS: 'equals',
+  CONTAINS: 'contains',
+  STARTS_WITH: 'starts_with',
+  ENDS_WITH: 'ends_with',
+  NOT_EMPTY: 'not_empty'
+}
+
+// 查询操作符标签
+export const QueryOperatorLabels = {
+  [QueryOperators.EQUALS]: '等于',
+  [QueryOperators.CONTAINS]: '包含',
+  [QueryOperators.STARTS_WITH]: '开头是',
+  [QueryOperators.ENDS_WITH]: '结尾是',
+  [QueryOperators.NOT_EMPTY]: '不为空'
+}
